@@ -32,21 +32,22 @@
             ],
             "outputMode": "static"
           },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
+            "configurations": {
+              "production": {
+                "baseHref": "/tv_shows/",
+                "budgets": [
+                  {
+                    "type": "initial",
+                    "maximumWarning": "500kB",
+                    "maximumError": "1MB"
+                  },
+                  {
+                    "type": "anyComponentStyle",
+                    "maximumWarning": "4kB",
+                    "maximumError": "8kB"
+                  }
+                ],
+                "outputHashing": "all"
             },
             "development": {
               "optimization": false,
