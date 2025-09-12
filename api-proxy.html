@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Proxy</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <script>
+        // Простой прокси для GitHub Pages
+        const API_BASE = 'https://api.tvmaze.com';
+        
+        // Перехватываем все запросы к /api/*
+        if (window.location.pathname.startsWith('/api/')) {
+            const apiPath = window.location.pathname.replace('/api', '');
+            const apiUrl = API_BASE + apiPath + window.location.search;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.body.innerHTML = `
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <script>
+                            // Если это запрос из iframe, отправляем данные родительскому окну
+                            if (window.parent !== window) {
+                                window.parent.postMessage({
+                                    type: 'api-response',
+                                    data: ${JSON.stringify(data)}
+                                }, '*');
+                            }
+                        </script>
+                    `;
+                })
+                .catch(error => {
+                    document.body.innerHTML = `<pre>Error: ${error.message}</pre>`;
+                });
+        } else {
+            document.body.innerHTML = '<h1>API Proxy Ready</h1><p>Use /api/ endpoint for TVMaze API</p>';
+        }
+    </script>
+</body>
+</html>
