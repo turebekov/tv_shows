@@ -1,0 +1,148 @@
+<section class="search-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i [class]="PrimeNgIcons.SEARCH + ' search-icon'"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Search for TV shows..."
+          (input)="onSearchInput($event)"
+          class="search-input"
+          [value]="searchQuery()"
+        />
+        @if (searchQuery()) {
+          <button
+            pButton
+            type="button"
+            [icon]="PrimeNgIcons.TIMES"
+            class="p-button-text p-button-sm clear-button"
+            (click)="onClearSearch()"
+            aria-label="Clear search"
+          ></button>
+        }
+      </div>
+    </div>
+  </section>
+  
+  <section class="results-section">
+    @if (loading()) {
+      <div class="loading-container">
+        <p-progressSpinner
+        [style]="APP_CONSTANTS.SPINNER.LARGE"
+        [strokeWidth]="APP_CONSTANTS.STROKE_WIDTH.LARGE"
+        fill="transparent"
+        [animationDuration]="APP_CONSTANTS.ANIMATION_DURATION"
+        ></p-progressSpinner>
+        <p class="loading-text">Searching for shows...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-container">
+        <p-message severity="error" [text]="error()!" [closable]="false"></p-message>
+      </div>
+    } @else if (hasShows()) {
+      <div class="shows-grid">
+        @for (show of showsWithActors(); track trackByShowId($index, show)) {
+          <p-card class="show-card">
+            <ng-template pTemplate="header">
+              @if (show.image && show.image.medium) {
+                <img [src]="show.image.medium" [alt]="show.name" class="show-image" />
+              } @else {
+                <div class="show-image-placeholder">
+                  <i [class]="PrimeNgIcons.IMAGE"></i>
+                </div>
+              }
+            </ng-template>
+  
+            <ng-template pTemplate="content">
+              <div class="show-content">
+                <h3 class="show-title">{{ show.name }}</h3>
+  
+                @if (show.genres.length > 0) {
+                  <div class="show-genres">
+                    @for (genre of show.genres; track genre) {
+                      <span class="genre-tag">{{ genre }}</span>
+                    }
+                  </div>
+                }
+  
+                @if (show.rating && show.rating.average) {
+                  <div class="show-rating">
+                    <i [class]="PrimeNgIcons.STAR_FILL"></i>
+                    <span>{{ show.rating.average | number: '1.1-1' }}</span>
+                  </div>
+                }
+  
+                @if (show.summary) {
+                  <p class="show-summary" [innerHTML]="show.summary"></p>
+                }
+              </div>
+            </ng-template>
+  
+            <ng-template pTemplate="footer">
+              <div class="actors-section">
+                <h4 class="actors-title">
+                  <i [class]="PrimeNgIcons.USERS"></i>
+                  Cast
+                </h4>
+  
+                @if (loadingActors().has(show.id)) {
+                  <div class="actors-loading">
+                    <p-progressSpinner
+                      [style]="APP_CONSTANTS.SPINNER.SMALL"
+                      [strokeWidth]="APP_CONSTANTS.STROKE_WIDTH.SMALL"
+                      fill="transparent"
+                      [animationDuration]="APP_CONSTANTS.ANIMATION_DURATION"
+                    ></p-progressSpinner>
+                    <span>Loading cast...</span>
+                  </div>
+                } @else if (show.actors.length > 0) {
+                  <div class="actors-list">
+                    @for (actor of show.actors; track trackByActorId($index, actor)) {
+                      <div class="actor-item">
+                        @if (actor.person.image && actor.person.image.medium) {
+                          <img
+                            [src]="actor.person.image.medium"
+                            [alt]="actor.person.name"
+                            class="actor-image"
+                          />
+                        } @else {
+                          <div class="actor-image-placeholder">
+                            <i [class]="PrimeNgIcons.USER"></i>
+                          </div>
+                        }
+                        <div class="actor-info">
+                          <span class="actor-name">{{ actor.person.name }}</span>
+                          @if (actor.character && actor.character.name) {
+                            <span class="actor-character">as {{ actor.character.name }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="no-actors">No cast information available</p>
+                }
+              </div>
+            </ng-template>
+          </p-card>
+        }
+      </div>
+    } @else if (searchQuery()) {
+      <div class="no-results">
+        <i [class]="PrimeNgIcons.SEARCH"></i>
+        <h3>No shows found</h3>
+        <p>Try searching for a different show name</p>
+      </div>
+    } @else {
+      <div class="welcome-message">
+        <i [class]="PrimeNgIcons.DESKTOP"></i>
+        <h3>Welcome to TV Show Search</h3>
+        <p>Search for your favorite TV shows and discover their cast</p>
+      </div>
+    }
+  </section>
+  
+  <section class="all-shows-section">
+    <sg-all-shows></sg-all-shows>
+  </section>
+  

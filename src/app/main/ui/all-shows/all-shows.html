@@ -1,0 +1,158 @@
+<div class="all-shows-container">
+  <div class="shows-header">
+    <h1>All TV Shows</h1>
+    <p class="shows-count">{{ filteredShows().length }} shows found ({{ showsPerPage }} per page)</p>
+  </div>
+
+  <div class="filters-section">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="genre-filter">Genre</label>
+        <p-select
+          id="genre-filter"
+          [options]="availableGenres()"
+          [(ngModel)]="selectedGenre"
+          placeholder="All Genres"
+          (onChange)="onGenreChange()"
+          [showClear]="true"
+          class="filter-dropdown"
+        ></p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="status-filter">Status</label>
+        <p-select
+          id="status-filter"
+          [options]="availableStatuses()"
+          [(ngModel)]="selectedStatus"
+          placeholder="All Statuses"
+          (onChange)="onStatusChange()"
+          [showClear]="true"
+          class="filter-dropdown"
+        ></p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="year-filter">Year</label>
+        <p-select
+          id="year-filter"
+          [options]="availableYears()"
+          [(ngModel)]="selectedYear"
+          placeholder="All Years"
+          (onChange)="onYearChange()"
+          [showClear]="true"
+          class="filter-dropdown"
+        ></p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rating-filter">Min Rating: {{ selectedRating }}</label>
+        <p-slider
+          id="rating-filter"
+          [(ngModel)]="selectedRating"
+          [min]="APP_CONSTANTS.MIN_RATING"
+          [max]="APP_CONSTANTS.MAX_RATING"
+          [step]="APP_CONSTANTS.RATING_STEP"
+          (onChange)="onRatingChange()"
+          class="rating-slider"
+        ></p-slider>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort-field">Sort By</label>
+        <div class="sort-controls">
+          <p-select
+            id="sort-field"
+            [options]="sortFields"
+            [(ngModel)]="selectedSortField"
+            (onChange)="onSortChange()"
+            class="sort-dropdown"
+          ></p-select>
+          <button
+            pButton
+            type="button"
+                   [icon]="sortDirection() === 'asc' ? PrimeNgIcons.SORT_UP : PrimeNgIcons.SORT_DOWN"
+            (click)="toggleSortDirection()"
+            class="p-button-outlined p-button-sm sort-button"
+            [title]="'Sort ' + (sortDirection() === 'asc' ? 'Descending' : 'Ascending')"
+            [attr.aria-label]="'Sort ' + (sortDirection() === 'asc' ? 'Descending' : 'Ascending')"
+          ></button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <button
+          pButton
+          type="button"
+                 [icon]="PrimeNgIcons.FILTER_SLASH"
+          (click)="clearFilters()"
+          class="p-button-outlined p-button-sm clear-filters-button"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-container">
+      <p-message
+        severity="error"
+        [text]="error()!"
+        [closable]="true"
+      ></p-message>
+    </div>
+  }
+
+  @if (loading() && shows().length === 0) {
+    <div class="loading-container">
+      <p-progressSpinner
+        [style]="APP_CONSTANTS.SPINNER.LARGE"
+        [strokeWidth]="APP_CONSTANTS.STROKE_WIDTH.LARGE"
+        fill="transparent"
+        [animationDuration]="APP_CONSTANTS.ANIMATION_DURATION"
+      ></p-progressSpinner>
+      <p class="loading-text">Loading shows ({{ showsPerPage }} per page)...</p>
+    </div>
+  }
+
+  @if (filteredShows().length > 0) {
+    <div class="shows-grid">
+      @for (show of filteredShows(); track show.id) {
+        <sg-show-card [show]="show"></sg-show-card>
+      }
+    </div>
+
+    @if (hasMorePages() && !loading()) {
+      <div class="load-more-container">
+        <button
+          pButton
+          type="button"
+                 [icon]="PrimeNgIcons.PLUS"
+          (click)="loadMoreShows()"
+          class="load-more-button"
+        >
+          Load More Shows
+        </button>
+      </div>
+    }
+
+    @if (loading() && shows().length > 0) {
+      <div class="loading-more-container">
+        <p-progressSpinner
+          [style]="APP_CONSTANTS.SPINNER.MEDIUM"
+          [strokeWidth]="APP_CONSTANTS.STROKE_WIDTH.MEDIUM"
+          fill="transparent"
+          [animationDuration]="APP_CONSTANTS.ANIMATION_DURATION"
+        ></p-progressSpinner>
+        <span>Loading more shows ({{ showsPerPage }} per page)...</span>
+      </div>
+    }
+  } @else if (!loading() && shows().length === 0) {
+    <div class="no-shows">
+             <i [class]="PrimeNgIcons.DESKTOP"></i>
+      <h3>No shows found</h3>
+      <p>Try adjusting your filters or check back later</p>
+    </div>
+  }
+</div>
