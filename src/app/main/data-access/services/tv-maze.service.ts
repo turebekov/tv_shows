@@ -10,7 +10,7 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 })
 export class TvMazeService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api';
+  private readonly baseUrl = 'https://api.tvmaze.com';
 
   searchShows(query: string): Observable<Show[]> {
     if (!query?.trim()) {
